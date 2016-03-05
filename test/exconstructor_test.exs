@@ -165,6 +165,11 @@ defmodule ExConstructorTest do
       use ExConstructor, underscore: false
     end
 
+    defmodule TestStructNoDash do
+      defstruct foo_bar: 1
+      use ExConstructor, dasherized: false
+    end
+
     it "supports strings: false" do
       ts_map = TestStructNoStrings.new(%{"foo" => 2})
       assert(1 == ts_map.foo)
@@ -191,6 +196,13 @@ defmodule ExConstructorTest do
       assert(1 == ts_map.fooBar)
       ts_kwlist = TestStructNoUnder.new([{"foo_bar", 2}])
       assert(1 == ts_kwlist.fooBar)
+    end
+
+    it "supports dasherized: false" do
+      ts_map = TestStructNoDash.new(%{:"foo-bar" => 2})
+      assert(1 == ts_map.foo_bar)
+      ts_kwlist = TestStructNoDash.new([{"foo-bar", 2}])
+      assert(1 == ts_kwlist.foo_bar)
     end
 
     it "supports overrides" do
