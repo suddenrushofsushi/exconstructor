@@ -7,10 +7,13 @@ defmodule ExConstructor do
   a constructor function into the module.
 
   The generated constructor, called `new` by default,
-  handles map-vs-keyword-list, string-vs-atom-keys, and
-  camelCase-vs-under_score input data issues automatically,
+  handles input format differences automatically,
   DRYing up your code and letting you move on to the interesting
   parts of your program.
+
+  * Input structure: Map or Keyword/2-tuple list
+  * Key type: String or Atom
+  * Key format: camelCase, under_score, dash-er-ized
 
   ## Installation
 
@@ -35,11 +38,14 @@ defmodule ExConstructor do
                   field_two: 2,
                   field_three: 3,
                   field_four: 4,
+                  field_five: 5
         use ExConstructor
       end
 
-      TestStruct.new(%{"field_one" => "a", "fieldTwo" => "b", :field_three => "c", :fieldFour => "d"})
-      # => %TestStruct{field_one: "a", field_two: "b", field_three: "c", field_four: "d"}
+      TestStruct.new(%{"field_one" => "a", "fieldTwo" => "b", :field_three => "c",
+                       :fieldFour => "d", "field-five" => "e"})
+      # => %TestStruct{field_one: "a", field_two: "b", field_three: "c",
+                       field_four: "d", field_five: "e"}
 
   For advanced usage, see `__using__/1` and `populate_struct/3`.
 
@@ -61,7 +67,8 @@ defmodule ExConstructor do
     defstruct strings: true,
               atoms: true,
               camelcase: true,
-              underscore: true
+              underscore: true,
+              dasherized: true
   end
 
 
@@ -84,7 +91,8 @@ defmodule ExConstructor do
   Keys of `map_or_kwlist` may be strings or atoms, in camelCase or
   under_score format.
 
-  `opts` may contain keys `strings`, `atoms`, `camelcase` and `underscore`.
+  `opts` may contain keys `strings`, `atoms`, `camelcase`, `underscore`,
+  and `dasherized`.
   Set these keys false to prevent testing of that key format in
   `map_or_kwlist`.  All default to `true`.
 
@@ -94,9 +102,7 @@ defmodule ExConstructor do
       def new(map_or_kwlist, opts \\ []) do
         ExConstructor.populate_struct(%__MODULE__{}, map_or_kwlist, Keyword.merge(@exconstructor_default_options, opts))
       end
-
-  Overriding `new/2` before or after the `use ExConstructor` statement
-  is allowed. Example uses include implementing your own `opts` handling.
+      defoverridable [new: 2]
   """
   defmacro __using__(name_or_opts \\ :new) do
     opts = cond do
@@ -131,7 +137,8 @@ defmodule ExConstructor do
   Keys of `map_or_kwlist` may be strings or atoms, in camelCase or
   under_score format.
 
-  `opts` may contain keys `strings`, `atoms`, `camelcase` and `underscore`.
+  `opts` may contain keys `strings`, `atoms`, `camelcase`, `underscore`,
+  and `dasherized`.
   Set these keys false to prevent testing of that key format in
   `map_or_kwlist`.  All default to `true`.
   """
@@ -150,8 +157,10 @@ defmodule ExConstructor do
       str = to_string(atom)
       under_str = Macro.underscore(str)
       camel_str = Macro.camelize(str) |> lcfirst
+      dash_str = str |> String.replace("_", "-")
       under_atom = String.to_atom(under_str)
       camel_atom = String.to_atom(camel_str)
+      dash_atom = String.to_atom(dash_str)
       value = cond do
         Map.has_key?(map, str) and opts.strings ->
           Map.get(map, str)
@@ -165,6 +174,10 @@ defmodule ExConstructor do
           Map.get(map, camel_str)
         Map.has_key?(map, camel_atom) and opts.atoms and opts.camelcase ->
           Map.get(map, camel_atom)
+        Map.has_key?(map, dash_str) and opts.strings and opts.dasherized ->
+          Map.get(map, dash_str)
+        Map.has_key?(map, dash_atom) and opts.atoms and opts.dasherized ->
+          Map.get(map, dash_atom)
         true ->
           Map.get(struct, atom)
       end

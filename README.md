@@ -11,24 +11,30 @@ Add `use ExConstructor` after a `defstruct` statement to inject
 a constructor function into the module.
 
 The generated constructor, called `new` by default,
-handles *map-vs-keyword-list*, *string-vs-atom-keys*, and
-*camelCase-vs-under_score* input data issues automatically,
+handles input format differences automatically,
 DRYing up your code and letting you move on to the interesting
 parts of your program.
+
+* Input structure: Map or Keyword/2-tuple list
+* Key type: String or Atom
+* Key format: camelCase, under_score, dash-er-ized
 
 ## Example
 
 ```elixir
 defmodule TestStruct do
-  defstruct field_one: nil,
-            field_two: nil,
-            field_three: nil,
-            field_four: nil
+  defstruct field_one: 1,
+            field_two: 2,
+            field_three: 3,
+            field_four: 4,
+            field_five: 5
   use ExConstructor
 end
 
-TestStruct.new(%{"field_one" => "a", "fieldTwo" => "b", :field_three => "c", :fieldFour => "d"})
-# => %TestStruct{field_one: "a", field_two: "b", field_three: "c", field_four: "d"}
+TestStruct.new(%{"field_one" => "a", "fieldTwo" => "b", :field_three => "c",
+                 :fieldFour => "d", "field-five" => "e"})
+# => %TestStruct{field_one: "a", field_two: "b", field_three: "c",
+                 field_four: "d", field_five: "e"}
 ```
 
 ## [Full Documentation](http://hexdocs.pm/exconstructor/ExConstructor.html)
