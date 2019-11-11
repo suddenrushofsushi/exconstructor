@@ -210,9 +210,8 @@ defmodule ExConstructor do
 
   ## Returns `str` with its first character lowercased.
   @spec lcfirst(String.t) :: String.t
-  defp lcfirst(str) do
-    first = String.slice(str, 0..0) |> String.downcase
-    first <> String.slice(str, 1..-1)
+  def lcfirst(<<x::bytes-size(1), rest::binary>>) do
+    String.downcase(x) <> rest
   end
 
 end
