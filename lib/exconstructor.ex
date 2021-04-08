@@ -147,7 +147,7 @@ defmodule ExConstructor do
             true -> raise "second argument must be a map or keyword list"
           end
     keys = case struct do
-      %{__struct__: _t} -> (struct |> :map.keys) -- [:__struct__]
+      %{__struct__: _t} -> (struct |> :maps.keys) -- [:__struct__]
       _ -> raise "first argument must be a struct"
     end
     Enum.reduce keys, struct, fn (atom, acc) ->
@@ -155,8 +155,6 @@ defmodule ExConstructor do
       under_str = Macro.underscore(str)
       up_camel_str = Macro.camelize(str)
       camel_str = lcfirst(up_camel_str)
-      under_atom = String.to_atom(under_str)
-      camel_atom = String.to_atom(camel_str)
       value = cond do
         Map.has_key?(map, str) and opts.strings ->
           Map.get(map, str)
