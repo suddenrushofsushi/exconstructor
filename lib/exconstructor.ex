@@ -162,16 +162,6 @@ defmodule ExConstructor do
           Map.get(map, str)
         Map.has_key?(map, atom) and opts.atoms ->
           Map.get(map, atom)
-        Map.has_key?(map, under_str) and opts.strings and opts.underscore ->
-          Map.get(map, under_str)
-        Map.has_key?(map, under_atom) and opts.atoms and opts.underscore ->
-          Map.get(map, under_atom)
-        Map.has_key?(map, up_camel_str) and opts.strings and opts.uppercamelcase ->
-          Map.get(map, up_camel_str)
-        Map.has_key?(map, camel_str) and opts.strings and opts.camelcase ->
-          Map.get(map, camel_str)
-        Map.has_key?(map, camel_atom) and opts.atoms and opts.camelcase ->
-          Map.get(map, camel_atom)
         true ->
           Map.get(struct, atom)
       end
