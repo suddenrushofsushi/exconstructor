@@ -147,7 +147,7 @@ defmodule ExConstructor do
             true -> raise "second argument must be a map or keyword list"
           end
     keys = case struct do
-      %{__struct__: _t} -> struct |> Map.from_struct |> Map.keys
+      %{__struct__: _t} -> (struct |> :map.keys) -- [:__struct__]
       _ -> raise "first argument must be a struct"
     end
     Enum.reduce keys, struct, fn (atom, acc) ->
