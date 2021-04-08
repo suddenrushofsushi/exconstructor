@@ -152,9 +152,6 @@ defmodule ExConstructor do
     end
     Enum.reduce keys, struct, fn (atom, acc) ->
       str = to_string(atom)
-      under_str = Macro.underscore(str)
-      up_camel_str = Macro.camelize(str)
-      camel_str = lcfirst(up_camel_str)
       value = cond do
         Map.has_key?(map, str) and opts.strings ->
           Map.get(map, str)
