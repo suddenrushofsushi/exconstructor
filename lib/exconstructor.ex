@@ -181,17 +181,7 @@ defmodule ExConstructor do
 
   @spec populate_struct(struct, map_or_kwlist, map_or_kwlist) :: struct
   def populate_struct(struct, map_or_kwlist, opts) do
-    opts_struct = try do
-      populate_struct(%Options{}, opts, %Options{})
-    rescue
-      ## prevent confusing error message
-      ex in RuntimeError -> case ex.message do
-        "second argument" <> _ ->
-          raise "third argument must be a map or keyword list"
-        _ ->
-          raise ex
-      end
-    end
+    opts_struct = populate_struct(%Options{}, opts, %Options{})
     populate_struct(struct, map_or_kwlist, opts_struct)
   end
 
